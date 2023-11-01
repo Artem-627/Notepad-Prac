@@ -82,25 +82,34 @@ void Content::deleteZeros(int first_line_index, int last_line_index) {
 
 void Content::deleteNIncNum(int line_index) {
   --line_index;
-  int curr_start_num = -1;
-  int curr_length = 0;
-  int prev_num = -1;
+  this->data[line_index]->push_back('a');
+  int curr_first_index = -1;
   bool is_erase = 0;
   for (int curr_symbol = 0; curr_symbol < this->data[line_index]->size();
        ++curr_symbol) {
-    if (*(this->data[line_index]->begin() + curr_symbol) - 48 >= 10) {
-      if (curr_start_num != -1 && is_erase) {
-        this->data[line_index]->erase(curr_start_num, curr_length);
-        curr_symbol -= curr_length;
+    if (*(this->data[line_index]->begin() + curr_symbol) >= '0' &&
+        *(this->data[line_index]->begin() + curr_symbol) <= '9') {
+      if (curr_first_index == -1) {
+        curr_first_index = curr_symbol;
+      } else {
+        if (*(this->data[line_index]->begin() + curr_symbol) <=
+            *(this->data[line_index]->begin() + curr_symbol - 1)) {
+          is_erase = 1;
+        }
       }
-      curr_start_num = -1;
-      curr_length = 0;
-      prev_num = -1;
     } else {
-      curr_start_num = (curr_start_num == -1) ? curr_symbol : curr_start_num;
+      if (curr_first_index != -1) {
+        if (is_erase) {
+          this->data[line_index]->erase(curr_first_index,
+                                        curr_symbol - curr_first_index);
+          curr_symbol -= curr_first_index - 1;
+        }
+        curr_first_index = -1;
+        is_erase = 0;
+      }
     }
-    std::cout << *(this->data[line_index]->begin() + curr_symbol) << '\n';
   }
+  this->data[line_index]->pop_back();
 }
 
 void Content::deleteParenthesis(int line_index) {
